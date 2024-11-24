@@ -37,26 +37,75 @@ self.tableViewBuilder.sections = [sectionModel]**
 import UIKit
 
 class ViewController: UIViewController {
-
-    //MARK: - Properties
-    private var tableView: UITableView
     
-    //MARK: - Lifecycle
+    // MARK: - Properties
+    private var tableViewBuilder: TableViewBuilder!
+    
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "defaultCell")
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        return tableView
+    }()
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .blue
+        
+        setupTableView()
+        setupTableViewBuilder()
     }
     
-    //MARK: - Init
-    init(tableView: UITableView) {
-        self.tableView = tableView
-        super.init(nibName: nil, bundle: nil)
+    // MARK: - Private Methods
+    private func setupTableView() {
+        view.addSubview(tableView)
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func setupTableViewBuilder() {
+        tableViewBuilder = TableViewBuilder(tableView: tableView)
+        
+        let cellModel1 = TableViewCellModel(identifier: "defaultCell")
+        cellModel1.onFill = { cell in
+            cell.textLabel?.text = "First Cell"
+            cell.backgroundColor = .cyan
+        }
+        cellModel1.onSelect = {
+            print("First cell selected!")
+        }
+        
+        let cellModel2 = TableViewCellModel(identifier: "defaultCell")
+        cellModel2.onFill = { cell in
+            cell.textLabel?.text = "Second Cell"
+            cell.backgroundColor = .yellow
+        }
+        cellModel2.onSelect = {
+            print("Second cell selected!")
+        }
+        
+        let section1 = TableViewSectionModel(cells: [cellModel1, cellModel2])
+        section1.header = TableViewHeaderModel(title: "Section 1")
+        
+        let cellModel3 = TableViewCellModel(identifier: "defaultCell")
+        cellModel3.onFill = { cell in
+            cell.textLabel?.text = "Another Cell in Section 2"
+            cell.backgroundColor = .green
+        }
+        cellModel3.onSelect = {
+            print("Cell in Section 2 selected!")
+        }
+        
+        let section2 = TableViewSectionModel(cells: [cellModel3])
+        section2.header = TableViewHeaderModel(title: "Section 2")
+        
+        tableViewBuilder.sections = [section1, section2]
     }
-    
-
 }
 
